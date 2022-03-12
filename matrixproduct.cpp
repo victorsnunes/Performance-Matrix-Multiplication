@@ -59,6 +59,7 @@ double OnMult(int m_ar, int m_br)
 	sprintf(st, "Time: %3.3f seconds\n", (double)(Time2 - Time1) / CLOCKS_PER_SEC);
 	cout << st;
 
+	// display 10 elements of the result matrix to verify correctness
 	cout << "Result matrix: " << endl;
 	for(i=0; i<1; i++)
 	{	for(j=0; j<min(10,m_br); j++)
@@ -136,6 +137,12 @@ double OnMultLine(int m_ar, int m_br)
     free(phc);
 	
 	return (double)(Time2 - Time1) / CLOCKS_PER_SEC;
+}
+
+void OnMultBlock(int m_ar, int m_br, int blk_sizes)
+{
+    
+    
 }
 
 
@@ -236,6 +243,7 @@ int main (int argc, char *argv[])
 	do {
 		cout << endl << "1. Multiplication" << endl;
 		cout << "2. Line Multiplication" << endl;
+		cout << "3 . Block" << endl;
 		cout << "4. Multiplication test 600 -> 3000, step: 400" << endl;
 		cout << "5. Line Multiplication test 600 -> 3000, step: 400" << endl;
 		cout << "Selection?: ";
@@ -260,8 +268,12 @@ int main (int argc, char *argv[])
 				break;
 			case 2:
 				OnMultLine(lin, col);
-    
 				break;
+			/*case 3:
+				cout << "Block Size?" ;
+				cin >> blockSize;
+				OnMultBlock(lin, col, blockSize);
+    			break;*/
 			case 4:
 				multTest(600, 3000, 400);
 				break;
