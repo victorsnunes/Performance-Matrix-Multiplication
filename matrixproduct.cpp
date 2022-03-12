@@ -173,11 +173,11 @@ int main (int argc, char *argv[])
 			case 2:
 				OnMultLine(lin, col);
 				break;
-			case 3:
+			/*case 3:
 				cout << "Block Size?" ;
 				cin >> blockSize;
 				OnMultBlock(lin, col, blockSize);
-    			break;
+    			break;*/
 		}
 
   		ret = PAPI_stop(EventSet, values);
