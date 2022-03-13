@@ -175,15 +175,11 @@ void init_papi() {
             << " REVISION: " << PAPI_VERSION_REVISION(retval) << "\n";
 }
 
-void multTest(int line, int end, int step) {
+void multTest(int line, int end, int step, fstream &logfile) {
 	// TODO: Implement loging for PAPI		
-
-	fstream logfile;
-	logfile.open("logfile.txt", ifstream::out);
-
 	double time;
 	
-	logfile << "Normal multiplicatiom:" << endl;
+	logfile << "Normal multiplicatiom: from " << line << " to " << end << " step:" << step << endl;
 
 	for(int lineCol = line; lineCol <= end; lineCol += step) {
 		time = OnMult(lineCol, lineCol);
@@ -191,15 +187,11 @@ void multTest(int line, int end, int step) {
 	}
 }
 
-void multLineTest(int line, int end, int step) {
+void multLineTest(int line, int end, int step, fstream &logfile) {
 	// TODO: Implement loging for PAPI		
-
-	fstream logfile;
-	logfile.open("logfile.txt", ifstream::out);
-
 	double time;
 
-	logfile << "Line multiplicatiom:" << endl;
+	logfile << "Line Multiplication: from " << line << " to " << end << " step:" << step << endl;
 
 	for(int lineCol = line; lineCol <= end; lineCol += step) {
 		time = OnMultLine(lineCol, lineCol);
@@ -219,6 +211,8 @@ int main (int argc, char *argv[])
   	long long values[2];
   	int ret;
 	
+	fstream logfile;
+	logfile.open("logfile.txt", ifstream::out);
 
 	ret = PAPI_library_init( PAPI_VER_CURRENT );
 	if ( ret != PAPI_VER_CURRENT )
@@ -244,6 +238,8 @@ int main (int argc, char *argv[])
 		cout << "3 . Block" << endl;
 		cout << "4. Multiplication test 600 -> 3000, step: 400" << endl;
 		cout << "5. Line Multiplication test 600 -> 3000, step: 400" << endl;
+		cout << "6. Line Multiplication test 4096 -> 10240, step: 2048" << endl;
+		cout << "9. All rests" << endl;
 		cout << "Selection?: ";
 		cin >>op;
 		if (op == 0)
@@ -267,16 +263,24 @@ int main (int argc, char *argv[])
 			case 2:
 				OnMultLine(lin, col);
 				break;
-			/*case 3:
+			/*case 3:s
 				cout << "Block Size?" ;
 				cin >> blockSize;
 				OnMultBlock(lin, col, blockSize);
     			break;*/
 			case 4:
-				multTest(600, 3000, 400);
+				multTest(600, 3000, 400, logfile);
 				break;
 			case 5:
-				multLineTest(600, 3000, 400);
+				multLineTest(600, 3000, 400, logfile);
+				break;
+			case 6:
+				multLineTest(2048, 10240, 2048, logfile);
+				break;
+			case 9:
+				multTest(600, 3000, 400, logfile);
+				multLineTest(600, 3000, 400, logfile);
+				multLineTest(2048, 10240, 2048, logfile);
 				break;
 		}
 
