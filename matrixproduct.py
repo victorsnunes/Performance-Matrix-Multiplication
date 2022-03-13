@@ -28,7 +28,7 @@ def OnMult(m_ar, m_br):
     for i in range(len(pha)):
         for j in range(len(phb[0])):
             for k in range(len(phb)):
-                res[i][j] = pha[i][k]*phb[k][j]
+                res[i][j] += pha[i][k]*phb[k][j]
     t2= time.process_time()
     result = (t2-t1)
     print('Time {:.4f} milliseconds \n'.format(result*1000))
