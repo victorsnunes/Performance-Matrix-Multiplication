@@ -33,7 +33,7 @@ def OnMult(m_ar, m_br):
                 res[i][j] = pha[i][k]*phb[k][j]
     t2= time.process_time()
     result = (t2-t1)
-    print('Time {:.2f} seconds \n'.format(result))
+    print('Time {:.4f} milliseconds \n'.format(result*1000))
 
     print('Result matrix:')
     print(res)
@@ -52,7 +52,7 @@ while opt != 0:
     print(opt)
     if opt == 0:
         break
-    if opt == 1:
+    if opt == 1 or opt == 2:
         print("hi")
         dimension = int(input("Dimensions: lins=cols?"))
         lin = dimension
