@@ -5,8 +5,6 @@ def OnMult(m_ar, m_br):
     pha = []
     phb = []
     phc = []
-    temp = 0
-
     # for i in range(m_ar):
     #     for j in range(m_ar):
     #         type(m_ar)
