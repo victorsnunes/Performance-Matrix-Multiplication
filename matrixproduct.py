@@ -17,6 +17,7 @@ def OnMult(m_ar, m_br):
     for i in range(len(aux)):
         aux[i] = aux[i]+1
     phb = np.full((m_br,m_br), aux)
+    phb = phb.transpose()
     print(phb)
     # phb.reshape((m_br,m_br))
     # for i in range(m_br):
