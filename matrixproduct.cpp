@@ -175,27 +175,78 @@ void init_papi() {
             << " REVISION: " << PAPI_VERSION_REVISION(retval) << "\n";
 }
 
+int setupPAPI(int &EventSet){
+	int ret = PAPI_library_init( PAPI_VER_CURRENT );
+	if ( ret != PAPI_VER_CURRENT )
+		std::cout << "FAIL" << endl;
+
+
+	ret = PAPI_create_eventset(&EventSet);
+		if (ret != PAPI_OK) cout << "ERROR: create eventset" << endl;
+
+
+	ret = PAPI_add_event(EventSet,PAPI_L1_DCM );
+	if (ret != PAPI_OK) cout << "ERROR: PAPI_L1_DCM" << endl;
+
+
+	ret = PAPI_add_event(EventSet,PAPI_L2_DCM);
+	if (ret != PAPI_OK) cout << "ERROR: PAPI_L2_DCM" << endl;
+
+	return ret;
+}
+
 void multTest(int line, int end, int step, fstream &logfile) {
-	// TODO: Implement loging for PAPI		
 	double time;
 	
+	int EventSet = PAPI_NULL;
+  	long long values[2];
+	// TODO: Test if this logging is working		
+  	int ret = setupPAPI(EventSet);
+	
 	logfile << "Normal multiplicatiom: from " << line << " to " << end << " step:" << step << endl;
+	logfile << "lineCol" << " " << "time" << " " << "L1_DCM" << " " << "L2_DCM" << endl;
 
 	for(int lineCol = line; lineCol <= end; lineCol += step) {
 		time = OnMult(lineCol, lineCol);
-		logfile << lineCol << " " << time << endl;
+
+		ret = PAPI_stop(EventSet, values);
+  		if (ret != PAPI_OK) cout << "ERROR: Stop PAPI" << endl;
+  		printf("L1 DCM: %lld \n",values[0]);
+  		printf("L2 DCM: %lld \n",values[1]);
+
+		ret = PAPI_reset( EventSet );
+		if ( ret != PAPI_OK )
+			std::cout << "FAIL reset" << endl; 
+
+		logfile << lineCol << " " << time << " " << values[0] << " " << values[1] << endl;
 	}
 }
 
 void multLineTest(int line, int end, int step, fstream &logfile) {
-	// TODO: Implement loging for PAPI		
 	double time;
 
+	int EventSet = PAPI_NULL;
+  	long long values[2];
+	// TODO: Test if this logging is working		
+  	int ret = setupPAPI(EventSet);
+	
 	logfile << "Line Multiplication: from " << line << " to " << end << " step:" << step << endl;
+	logfile << "lineCol" << " " << "time" << " " << "L1_DCM" << " " << "L2_DCM" << endl;
 
 	for(int lineCol = line; lineCol <= end; lineCol += step) {
 		time = OnMultLine(lineCol, lineCol);
-		logfile << lineCol << " " << time << endl;
+		
+		ret = PAPI_stop(EventSet, values);
+  		if (ret != PAPI_OK) cout << "ERROR: Stop PAPI" << endl;
+  		printf("L1 DCM: %lld \n",values[0]);
+  		printf("L2 DCM: %lld \n",values[1]);
+
+		ret = PAPI_reset( EventSet );
+		if ( ret != PAPI_OK )
+			std::cout << "FAIL reset" << endl; 
+
+		logfile << lineCol << " " << time << " " << values[0] << " " << values[1] << endl;
+	
 	}
 }
 
@@ -235,7 +286,7 @@ int main (int argc, char *argv[])
 	do {
 		cout << endl << "1. Multiplication" << endl;
 		cout << "2. Line Multiplication" << endl;
-		cout << "3 . Block" << endl;
+		cout << "3. Block" << endl;
 		cout << "4. Multiplication test 600 -> 3000, step: 400" << endl;
 		cout << "5. Line Multiplication test 600 -> 3000, step: 400" << endl;
 		cout << "6. Line Multiplication test 4096 -> 10240, step: 2048" << endl;
