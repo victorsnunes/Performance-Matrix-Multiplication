@@ -5,8 +5,6 @@ def OnMult(m_ar, m_br):
     pha = []
     phb = []
     phc = []
-    temp = 0
-
     # for i in range(m_ar):
     #     for j in range(m_ar):
     #         type(m_ar)
@@ -16,9 +14,10 @@ def OnMult(m_ar, m_br):
     print(pha)
     print(" \n")
     aux = np.arange(m_br)
-    for i in range(len(phb)):
-        phb[i] = phb[i]+1
+    for i in range(len(aux)):
+        aux[i] = aux[i]+1
     phb = np.full((m_br,m_br), aux)
+    phb = phb.transpose()
     print(phb)
     # phb.reshape((m_br,m_br))
     # for i in range(m_br):
@@ -30,10 +29,10 @@ def OnMult(m_ar, m_br):
     for i in range(len(pha)):
         for j in range(len(phb[0])):
             for k in range(len(phb)):
-                res[i][j] = pha[i][k]*phb[k][j]
+                res[i][j] += pha[i][k]*phb[k][j]
     t2= time.process_time()
     result = (t2-t1)
-    print('Time {:.2f} seconds \n'.format(result))
+    print('Time {:.4f} milliseconds \n'.format(result*1000))
 
     print('Result matrix:')
     print(res)
@@ -52,7 +51,7 @@ while opt != 0:
     print(opt)
     if opt == 0:
         break
-    if opt == 1:
+    if opt == 1 or opt == 2:
         print("hi")
         dimension = int(input("Dimensions: lins=cols?"))
         lin = dimension

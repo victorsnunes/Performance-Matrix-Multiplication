@@ -175,35 +175,78 @@ void init_papi() {
             << " REVISION: " << PAPI_VERSION_REVISION(retval) << "\n";
 }
 
-void multTest(int line, int end, int step) {
-	// TODO: Implement loging for PAPI		
+int setupPAPI(int &EventSet){
+	int ret = PAPI_library_init( PAPI_VER_CURRENT );
+	if ( ret != PAPI_VER_CURRENT )
+		std::cout << "FAIL" << endl;
 
-	fstream logfile;
-	logfile.open("logfile.txt", ifstream::out);
 
+	ret = PAPI_create_eventset(&EventSet);
+		if (ret != PAPI_OK) cout << "ERROR: create eventset" << endl;
+
+
+	ret = PAPI_add_event(EventSet,PAPI_L1_DCM );
+	if (ret != PAPI_OK) cout << "ERROR: PAPI_L1_DCM" << endl;
+
+
+	ret = PAPI_add_event(EventSet,PAPI_L2_DCM);
+	if (ret != PAPI_OK) cout << "ERROR: PAPI_L2_DCM" << endl;
+
+	return ret;
+}
+
+void multTest(int line, int end, int step, fstream &logfile) {
 	double time;
 	
-	logfile << "Normal multiplicatiom:" << endl;
+	int EventSet = PAPI_NULL;
+  	long long values[2];
+	// TODO: Test if this logging is working		
+  	int ret = setupPAPI(EventSet);
+	
+	logfile << "Normal multiplicatiom: from " << line << " to " << end << " step:" << step << endl;
+	logfile << "lineCol" << " " << "time" << " " << "L1_DCM" << " " << "L2_DCM" << endl;
 
 	for(int lineCol = line; lineCol <= end; lineCol += step) {
 		time = OnMult(lineCol, lineCol);
-		logfile << lineCol << " " << time << endl;
+
+		ret = PAPI_stop(EventSet, values);
+  		if (ret != PAPI_OK) cout << "ERROR: Stop PAPI" << endl;
+  		printf("L1 DCM: %lld \n",values[0]);
+  		printf("L2 DCM: %lld \n",values[1]);
+
+		ret = PAPI_reset( EventSet );
+		if ( ret != PAPI_OK )
+			std::cout << "FAIL reset" << endl; 
+
+		logfile << lineCol << " " << time << " " << values[0] << " " << values[1] << endl;
 	}
 }
 
-void multLineTest(int line, int end, int step) {
-	// TODO: Implement loging for PAPI		
-
-	fstream logfile;
-	logfile.open("logfile.txt", ifstream::out);
-
+void multLineTest(int line, int end, int step, fstream &logfile) {
 	double time;
 
-	logfile << "Line multiplicatiom:" << endl;
+	int EventSet = PAPI_NULL;
+  	long long values[2];
+	// TODO: Test if this logging is working		
+  	int ret = setupPAPI(EventSet);
+	
+	logfile << "Line Multiplication: from " << line << " to " << end << " step:" << step << endl;
+	logfile << "lineCol" << " " << "time" << " " << "L1_DCM" << " " << "L2_DCM" << endl;
 
 	for(int lineCol = line; lineCol <= end; lineCol += step) {
 		time = OnMultLine(lineCol, lineCol);
-		logfile << lineCol << " " << time << endl;
+		
+		ret = PAPI_stop(EventSet, values);
+  		if (ret != PAPI_OK) cout << "ERROR: Stop PAPI" << endl;
+  		printf("L1 DCM: %lld \n",values[0]);
+  		printf("L2 DCM: %lld \n",values[1]);
+
+		ret = PAPI_reset( EventSet );
+		if ( ret != PAPI_OK )
+			std::cout << "FAIL reset" << endl; 
+
+		logfile << lineCol << " " << time << " " << values[0] << " " << values[1] << endl;
+	
 	}
 }
 
@@ -219,6 +262,8 @@ int main (int argc, char *argv[])
   	long long values[2];
   	int ret;
 	
+	fstream logfile;
+	logfile.open("logfile.txt", ifstream::out);
 
 	ret = PAPI_library_init( PAPI_VER_CURRENT );
 	if ( ret != PAPI_VER_CURRENT )
@@ -241,9 +286,11 @@ int main (int argc, char *argv[])
 	do {
 		cout << endl << "1. Multiplication" << endl;
 		cout << "2. Line Multiplication" << endl;
-		cout << "3 . Block" << endl;
+		cout << "3. Block" << endl;
 		cout << "4. Multiplication test 600 -> 3000, step: 400" << endl;
 		cout << "5. Line Multiplication test 600 -> 3000, step: 400" << endl;
+		cout << "6. Line Multiplication test 4096 -> 10240, step: 2048" << endl;
+		cout << "9. All rests" << endl;
 		cout << "Selection?: ";
 		cin >>op;
 		if (op == 0)
@@ -267,16 +314,24 @@ int main (int argc, char *argv[])
 			case 2:
 				OnMultLine(lin, col);
 				break;
-			/*case 3:
+			/*case 3:s
 				cout << "Block Size?" ;
 				cin >> blockSize;
 				OnMultBlock(lin, col, blockSize);
     			break;*/
 			case 4:
-				multTest(600, 3000, 400);
+				multTest(600, 3000, 400, logfile);
 				break;
 			case 5:
-				multLineTest(600, 3000, 400);
+				multLineTest(600, 3000, 400, logfile);
+				break;
+			case 6:
+				multLineTest(2048, 10240, 2048, logfile);
+				break;
+			case 9:
+				multTest(600, 3000, 400, logfile);
+				multLineTest(600, 3000, 400, logfile);
+				multLineTest(2048, 10240, 2048, logfile);
 				break;
 		}
 
